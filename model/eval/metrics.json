@@ -1,0 +1,26 @@
+{
+  "accuracy": 0.6819770344483275,
+  "macro_f1": 0.43029575603767556,
+  "weighted_f1": 0.6934045787367432,
+  "auc_ovr_macro": 0.886399837434778,
+  "ece": 0.031120320171102906,
+  "num_test_samples": 2003,
+  "classes": [
+    "akiec",
+    "bcc",
+    "bkl",
+    "df",
+    "mel",
+    "nv",
+    "vasc"
+  ],
+  "melanoma_vs_rest": {
+    "melanoma_class_index": 4,
+    "sensitivity_recall": 0.3157894736842105,
+    "specificity": 0.9520624303232998,
+    "tp": 66,
+    "tn": 1708,
+    "fp": 86,
+    "fn": 143
+  }
+}

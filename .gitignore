@@ -1,0 +1,7 @@
+.venv/
+data/images/
+model/skin_cancer_model_v2.keras
+model/skin_cancer_model.keras
+model/__pycache__/
+__pycache__/
+*.pyc
