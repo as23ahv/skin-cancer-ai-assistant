@@ -8,8 +8,8 @@ from PIL import Image
 import sys
 from pathlib import Path
 
-#Make project root importable
-ROOT_DIR = Path(__file__).resolve().parents[1]  # Final Year Project/
+
+ROOT_DIR = Path(__file__).resolve().parents[1]  
 sys.path.append(str(ROOT_DIR))
 
 from model.gradcam import build_grad_model, make_gradcam, overlay_heatmap

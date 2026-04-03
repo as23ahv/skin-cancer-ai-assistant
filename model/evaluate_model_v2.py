@@ -17,7 +17,7 @@ from sklearn.metrics import (
 import matplotlib.pyplot as plt
 
 
-# -------------------- CONFIG --------------------
+
 SEED = 42
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
@@ -28,12 +28,12 @@ MODEL_PATH = Path("model/skin_cancer_model_v2.keras")
 OUT_DIR = Path("model/eval")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# If you want *identical* splits every time, keep these files after first run:
+
 SPLIT_DIR = OUT_DIR / "splits"
 SPLIT_DIR.mkdir(parents=True, exist_ok=True)
 
-TRAIN_RATIO = 0.80  # only used if split files don't exist
-# ------------------------------------------------
+TRAIN_RATIO = 0.80
+
 
 
 def seed_everything(seed: int):
@@ -86,7 +86,7 @@ def ensure_splits(all_paths, all_labels):
         test_paths, test_labels = load_split("test")
         return train_paths, train_labels, test_paths, test_labels
 
-    # Create deterministic shuffle
+    
     perm = np.random.permutation(len(all_paths))
     all_paths = all_paths[perm]
     all_labels = all_labels[perm]
@@ -105,7 +105,7 @@ def ensure_splits(all_paths, all_labels):
 
 def load_img(path, label):
     img_bytes = tf.io.read_file(path)
-    # decode_image supports jpeg + png (unlike decode_jpeg)
+    
     img = tf.image.decode_image(img_bytes, channels=3, expand_animations=False)
     img = tf.image.resize(img, IMG_SIZE)
     img = tf.cast(img, tf.float32) / 255.0
@@ -182,7 +182,7 @@ def plot_reliability(probs: np.ndarray, y_true: np.ndarray, out_path: Path, n_bi
             bin_confs.append(np.mean(confidences[mask]))
 
     fig = plt.figure(figsize=(6, 6))
-    plt.plot([0, 1], [0, 1])  # perfect calibration line
+    plt.plot([0, 1], [0, 1])  
     if bin_centers:
         plt.plot(bin_confs, bin_accs, marker="o")
     plt.title("Reliability Diagram")
@@ -205,7 +205,7 @@ def melanoma_metrics(classes, y_true, y_pred):
             mel_idx = name_map[key]
             break
     if mel_idx is None:
-        return None  # not available
+        return None 
 
     y_true_bin = (np.array(y_true) == mel_idx).astype(int)
     y_pred_bin = (np.array(y_pred) == mel_idx).astype(int)
@@ -215,7 +215,7 @@ def melanoma_metrics(classes, y_true, y_pred):
     fp = int(np.sum((y_true_bin == 0) & (y_pred_bin == 1)))
     fn = int(np.sum((y_true_bin == 1) & (y_pred_bin == 0)))
 
-    sensitivity = tp / (tp + fn) if (tp + fn) else 0.0  # recall
+    sensitivity = tp / (tp + fn) if (tp + fn) else 0.0  
     specificity = tn / (tn + fp) if (tn + fp) else 0.0
     return {
         "melanoma_class_index": mel_idx,
@@ -252,7 +252,7 @@ def main():
 
     y_prob = np.concatenate(y_prob, axis=0)
 
-    # --- Core metrics ---
+    
     acc = accuracy_score(y_true, y_pred)
     macro_f1 = f1_score(y_true, y_pred, average="macro")
     weighted_f1 = f1_score(y_true, y_pred, average="weighted")
@@ -260,22 +260,22 @@ def main():
     report_dict = classification_report(y_true, y_pred, target_names=classes, digits=4, output_dict=True)
     cm = confusion_matrix(y_true, y_pred)
 
-    # --- ROC-AUC (OvR) if possible ---
+    
     auc_ovr = None
     try:
-        # One-hot y_true
+        
         y_true_oh = np.eye(len(classes))[np.array(y_true)]
         auc_ovr = roc_auc_score(y_true_oh, y_prob, average="macro", multi_class="ovr")
     except Exception:
         auc_ovr = None
 
-    # --- Calibration ---
+    
     ece = expected_calibration_error(y_prob, np.array(y_true), n_bins=15)
 
-    # --- Melanoma metrics if present ---
+    
     mel = melanoma_metrics(classes, y_true, y_pred)
 
-    # --- Save artifacts ---
+    
     np.save(OUT_DIR / "y_true.npy", np.array(y_true))
     np.save(OUT_DIR / "y_pred.npy", np.array(y_pred))
     np.save(OUT_DIR / "y_prob.npy", np.array(y_prob))
@@ -299,7 +299,7 @@ def main():
     plot_confusion_matrix(cm, classes, OUT_DIR / "confusion_matrix.png")
     plot_reliability(y_prob, np.array(y_true), OUT_DIR / "reliability.png", n_bins=10)
 
-    # Print summary
+    
     print("\n=== Evaluation Summary ===")
     print(f"Accuracy:   {acc:.4f}")
     print(f"Macro F1:   {macro_f1:.4f}")

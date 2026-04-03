@@ -5,7 +5,7 @@ echo ===============================
 echo Final Year Project Runner
 echo ===============================
 
-REM --- Use THIS project's venv python directly (no activate needed)
+REM 
 set VENV_PY=%CD%\.venv\Scripts\python.exe
 
 if not exist "%VENV_PY%" (

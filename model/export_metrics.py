@@ -35,7 +35,7 @@ def main():
         shuffle=False
     )
 
-    # normalize
+    
     ds = ds.map(lambda x, y: (tf.cast(x, tf.float32) / 255.0, y))
 
     y_true = []
@@ -49,12 +49,12 @@ def main():
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
 
-    # Save classification report
+    
     report = classification_report(y_true, y_pred, target_names=labels, digits=3)
     with open(os.path.join(OUT_DIR, "classification_report.txt"), "w") as f:
         f.write(report)
 
-    # Save confusion matrix image
+    
     cm = confusion_matrix(y_true, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -64,7 +64,7 @@ def main():
     plt.savefig(os.path.join(OUT_DIR, "confusion_matrix.png"), dpi=200)
     plt.close()
 
-    # Save simple accuracy text
+
     acc = float((y_true == y_pred).mean())
     with open(os.path.join(OUT_DIR, "summary.txt"), "w") as f:
         f.write(f"Accuracy: {acc:.4f}\n")

@@ -37,7 +37,7 @@ def overlay_heatmap(original_pil, heatmap, alpha=0.45):
     heatmap_img = Image.fromarray(np.uint8(255 * heatmap)).resize(original_pil.size)
     heat = np.array(heatmap_img)
 
-    # red for high attention, blue for low attention
+    
     heat_rgb = np.stack([heat, np.zeros_like(heat), 255 - heat], axis=-1).astype(np.uint8)
     heat_pil = Image.fromarray(heat_rgb)
 
@@ -79,7 +79,7 @@ def make_gradcam(grad_model, img_array, class_index=None):
     with tf.GradientTape() as tape:
         feature_maps, preds = grad_model(img_tensor, training=False)
 
-        # --- FIX: ensure class_index is always a tensor ---
+
         if class_index is None:
             class_index = tf.argmax(preds[0])
         else:
@@ -90,7 +90,7 @@ def make_gradcam(grad_model, img_array, class_index=None):
     grads = tape.gradient(loss, feature_maps)
     pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
 
-    feature_maps = feature_maps[0]  # (h,w,c)
+    feature_maps = feature_maps[0]  
     heatmap = tf.reduce_sum(feature_maps * pooled_grads, axis=-1)
 
     heatmap = tf.maximum(heatmap, 0)

@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from model.gradcam import build_grad_model, make_gradcam, overlay_heatmap
 
-# PDF export
+
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -25,14 +25,14 @@ MODEL_PATH = "model/skin_cancer_model_v2.keras"
 LABELS_PATH = "model/labels.json"
 IMG_SIZE = (224, 224)
 
-# --- Thresholds ---
+
 DEFAULT_LOW_CONF_THRESHOLD = 0.55
 MED_CONF_THRESHOLD = 0.75
 
-# ----------------- Page config -----------------
+
 st.set_page_config(page_title="Skin Cancer AI Assistant", layout="wide")
 
-# IMPORTANT: do NOT hide header -> keeps the top-left arrows/toggle
+
 CUSTOM_CSS = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -78,15 +78,15 @@ footer {visibility: hidden;}
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-# ----------------- Session state for "Your Chats" -----------------
+
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []  # list of dicts: {"role": "user"/"assistant", "content": str}
+    st.session_state.chat_history = []  
 
 def add_chat(role: str, content: str):
     st.session_state.chat_history.append({"role": role, "content": content})
 
 
-# ----------------- Caching -----------------
+
 @st.cache_resource
 def load_model():
     model = tf.keras.models.load_model(MODEL_PATH)
@@ -183,7 +183,7 @@ def generate_pdf_report(
     return buffer.read()
 
 
-# ----------------- Sidebar (keep Streamlit arrows) -----------------
+
 with st.sidebar:
     st.markdown("### 🧠 Controls")
     show_gradcam = st.toggle("Show Grad-CAM", value=True)
@@ -193,7 +193,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 💬 Your Chats")
 
-    # Clear button
+    
     col_a, col_b = st.columns([1, 1])
     with col_a:
         if st.button("Clear chat"):
@@ -201,7 +201,7 @@ with st.sidebar:
     with col_b:
         st.caption(f"{len(st.session_state.chat_history)} msgs")
 
-    # Chat view
+    
     if len(st.session_state.chat_history) == 0:
         st.caption("Your messages and the assistant replies will appear here.")
     else:
@@ -212,7 +212,7 @@ with st.sidebar:
                 st.markdown(f"**Assistant:** {msg['content']}")
 
 
-# ----------------- Header -----------------
+
 st.markdown(
     """
 <div class="card">
@@ -228,7 +228,7 @@ st.markdown(
 st.write("")
 
 
-# ----------------- Main layout -----------------
+
 left, right = st.columns([1.05, 0.95], gap="large")
 
 with left:
@@ -250,9 +250,9 @@ with right:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ----------------- Stop early if no upload -----------------
+
 if uploaded is None:
-    # Lightweight chat input still available without an image
+    
     q = st.chat_input("Ask about the tool (e.g., “what does Grad-CAM mean?”)")
     if q:
         add_chat("user", q)
@@ -261,7 +261,7 @@ if uploaded is None:
     st.stop()
 
 
-# ----------------- Load + validate image -----------------
+
 try:
     image = Image.open(uploaded).convert("RGB")
 except UnidentifiedImageError:
@@ -271,10 +271,10 @@ except Exception as e:
     st.error(f"Could not open image: {e}")
     st.stop()
 
-# Log upload as a "chat" event
+
 add_chat("user", f"Uploaded image: {getattr(uploaded, 'name', 'image')}")
 
-# ----------------- Predict -----------------
+
 model, grad_model = load_model()
 labels = load_labels()
 
@@ -292,7 +292,7 @@ band = confidence_band(confidence, low_conf_threshold)
 topk_idx = np.argsort(preds)[::-1][:topk_k]
 topk_items = [(labels[int(i)], float(preds[int(i)])) for i in topk_idx]
 
-# ----------------- Grad-CAM -----------------
+
 overlay = None
 if show_gradcam:
     try:
@@ -302,10 +302,10 @@ if show_gradcam:
         st.warning(f"Grad-CAM failed (still showing prediction). Details: {e}")
         overlay = None
 
-# Add assistant prediction summary to chat history (only once per run)
+
 add_chat("assistant", f"Prediction: {label} ({confidence*100:.2f}%, certainty: {band}).")
 
-# ----------------- Render output -----------------
+
 out_left, out_right = st.columns([1, 1], gap="large")
 
 with out_left:
@@ -376,14 +376,14 @@ with out_right:
             use_container_width=True,
         )
 
-# ----------------- Chat input (main page) -----------------
+
 user_q = st.chat_input("Ask a question about your result (e.g., “why low confidence?”)")
 if user_q:
     add_chat("user", user_q)
 
     q_lower = user_q.lower()
 
-    # ✅ NEW: context-aware elaboration (uses the current prediction + confidence + top3)
+    
     top3_idx = np.argsort(preds)[::-1][:3]
     top3_lines = "\n".join([f"- {labels[int(i)]}: {float(preds[int(i)])*100:.2f}%" for i in top3_idx])
 
@@ -413,7 +413,7 @@ if user_q:
             f"If you want, tell me what you want explained more: **confidence**, **top predictions**, or **Grad-CAM**."
         )
 
-    # ✅ NEW: Elaborate triggers
+    
     wants_detail = any(
         phrase in q_lower
         for phrase in [
@@ -425,7 +425,7 @@ if user_q:
     if wants_detail:
         reply = detailed_output_explanation()
 
-    # Existing logic (kept exactly, just moved after the new detailed check)
+    
     elif "grad" in q_lower or "cam" in q_lower or "heatmap" in q_lower:
         reply = (
             f"Grad-CAM is the visual explanation. It highlights regions that most influenced the prediction.\n\n"

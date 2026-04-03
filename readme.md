@@ -29,8 +29,7 @@ cd skin-cancer-ai-assistant
 2. Create a virtual environment and install dependencies:
 ```bash
 python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # macOS/Linux
+.venv\Scripts\activate        
 pip install -r requirements.txt
 ```
 

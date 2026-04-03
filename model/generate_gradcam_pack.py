@@ -4,12 +4,12 @@ import subprocess
 from pathlib import Path
 import sys
 
-#Settings
+
 DATA_DIR = Path("data/images")
 OUT_DIR = Path("outputs/gradcam_examples")
 GRADCAM_SCRIPT = Path("model/gradcam.py")
 
-# How many per class
+
 N_PER_CLASS = {
     "mel": 3,
     "nv": 3,
@@ -21,7 +21,7 @@ N_PER_CLASS = {
 }
 
 SEED = 42
-# --------------------------
+
 
 random.seed(SEED)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
